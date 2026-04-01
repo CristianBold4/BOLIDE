@@ -1,0 +1,19 @@
+set(header_files
+        include/Utils.h
+        include/utils/hash_table5.hpp
+        include/utils/hash_set8.hpp
+        include/utils/random.h
+        include/utils/stop_watch.h
+        include/NodeSampler.h
+        include/TriangleCounter.h
+        include/GraphStream.h
+)
+
+set(sources
+        src/Utils.cpp
+        src/utils/random.cpp
+        src/utils/stop_watch.cpp
+        src/NodeSampler.cpp
+        src/TriangleCounter.cpp
+        src/main.cpp
+)
