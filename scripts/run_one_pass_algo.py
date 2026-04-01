@@ -105,7 +105,7 @@ def run_one_pass_algo(args: argparse.Namespace) -> None:
                    f"{args.dataset_path} " # graph stream path
                    f"{p_sample_head} " # p_h
                    f"{p_sample_tail} " # p_t
-                   f"{0.5} " # set eps to 0.5 to recover tai roughly 10 as in the paper
+                   f"{0.5} " # set eps to 0.5 to recover tau roughly 10 as in the paper
                    f"{output_path_exp} " # output path
                    f"{random_seed_sample} " # random seed for node sampling
                    f"{random_seed} " # random seed for edge sampling
