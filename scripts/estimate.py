@@ -320,6 +320,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Script for generating plots")
     parser.add_argument('--dataset_name', '-n', type=str, help='Name of the dataset to process')
     parser.add_argument('--root_path', '-r', type=str, help='Root path for experiment results')
+    parser.add_argument('--bin-size', '-b', type=float, help='Bin size for degree intervals, i.e., D_i = [b^i, b^{i+1})')
     parser.add_argument('--output_folder', '-o', type=str,
                         help='Folder for saving NDCC and WDCC distro, and RHAS distances')
     args = parser.parse_args()
