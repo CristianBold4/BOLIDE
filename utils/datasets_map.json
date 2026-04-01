@@ -14,40 +14,9 @@
     "edges": 42851237,
     "h-index": 989,
     "triangles": 285730264,
-    "4-cliques": 9933532019,
-    "5-cliques": 467429836174,
     "title": "LiveJournal $(n = 4.8M, m = 42M, T = 285M)$",
     "title_2": "LiveJournal $(n = 4.8M, m = 42M, C_3 = 285M, C_4 = 9.9B, C_5 = 467B)$",
     "short_title": "livejournal",
     "abbr": "LJ"
-  },
-
-  "com-orkut": {
-    "nodes": 3072441,
-    "edges": 117185083,
-    "h-index": 1638,
-    "triangles": 627584181,
-    "title": "com-orkut $(n = 3M, m = 117M, T = 627M)$",
-    "short_title": "com-orkut",
-    "abbr": "ORK"
-  },
-
-  "twitter": {
-    "nodes": 41652230,
-    "edges": 1202513046,
-    "h-index": 8930,
-    "triangles": 34824916864,
-    "title": "twitter $(n = 41M, m = 1.2B, T = 34B)$",
-    "short_title": "twitter",
-    "abbr": "TW"
-  },
-  "com-friendster": {
-    "nodes": 65608366,
-    "edges": 1806067135,
-    "h-index": 2958,
-    "triangles": 4173724142,
-    "title": "com-friendster $(n = 65M, m = 1.8B, T = 4.1B)$",
-    "short_title": "com-friendster",
-    "abbr": "FR"
   }
 }

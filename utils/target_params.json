@@ -1,0 +1,17 @@
+{
+  "as-skitter": {
+    "p_sample_head": 0.2,
+    "p_sample_tail": 0.005,
+    "head_memory_perc": 0.09,
+    "tail_memory_perc": 0.01,
+    "aux_memory_perc": 0.01
+  },
+
+  "livejournal": {
+    "p_sample_head": 0.2,
+    "p_sample_tail": 0.005,
+    "head_memory_perc": 0.09,
+    "tail_memory_perc": 0.01,
+    "aux_memory_perc": 0.01
+  }
+}
