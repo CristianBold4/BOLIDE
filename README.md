@@ -2,13 +2,12 @@
 
 Cristian Boldrin and C. Seshadhri, "Single-Pass Estimation of the Clustering Coefficient Distribution in Graph Streams", under review for VLDB 2027.
 
-## Supplementary Material
-Supplementary Material is located in: 
+**Supplementary Material** is located in the root folder (open pdf [here](https://github.com/CristianBold4/BOLIDE/blob/main/supp_material.pdf))
 
 ---
 
 ## Installation and Usage
-Here are the instructions for running *BOLIDE* algorithm: **B**inned degree **O**ne-pass c**L**ustering coeffic**I**ents **D**istribution **E**stimation.
+Here are the instructions for running *BOLIDE* algorithm: *B*inned degree *O*ne-pass c*L*ustering coeffic*I*ents *D*istribution *E*stimation.
 Code is deployed in *C++ 22* under *gcc 13.3.0* compiler. Additionally, *CMake 3.16.3+* is required.
 
 Within the `code` folder:
@@ -40,7 +39,17 @@ Within the `code` folder:
    <br><br>
    `./build/BOLIDE  <graph_path> <p_head> <p_tail> <eps> <output_path> <random_seed_sample> <random_seed_triangle_counter> <aux_sample_size> <head_budget> <tail_budget>`
    <br><br>
-   where *graph_path* is the path to the preprocessed dataset at point (2), *p_head* and *p_tail* are the sampling probabilities for the head and tail of the degree distribution, respectively, *eps* is the error parameter, *output_path* is the path where the output will be saved, *random_seed_sample* is the random seed used for sampling edges, *random_seed_triangle_counter* is the random seed used for counting triangles, *aux_sample_size* is the size of the auxiliary sample used for counting triangles, *head_budget* is the memory budget allocated for sampling edges in the head of the degree distribution, and *tail_budget* is the memory budget allocated for sampling edges in the tail of the degree distribution.
+   where
+   -  *graph_path* is the path to the preprocessed dataset at point (2);
+   -   *p_head* is the probability of sampling head nodes ($p_h$ in the paper);
+   -   *p_tail* is the probability for sampling tail nodes ($p_t$ in the paper) via sample-and-hold;
+   -   *eps* is the parameter inducing degree threshold $\tau$, computed as $\tau = 3 \log( 1 / \varepsilon) / \varepsilon^2$ (see *headtail* paper). In our experiments, we set *eps* = 0.48 so that $\tau \approx 10$;
+   -   *output_path* is the path where the output will be saved ($S_h, S_t, \hat{T}_h, \hat{T}_t$ and information containing runtime, $\tau$, etc;
+   -   *random_seed_sample* is the random seed used for sampling nodes;
+   -   *random_seed_triangle_counter* is the random seed used for sampling edges;
+   -   *aux_sample_size* is the size of the auxiliary samples, i.e., $B_{A_h} + B_{A_t}$ assuming that $B_{A_h}| = |B_{A_t}$;
+   -   *head_budget* is the memory budget for head main sample, i.e,. $B_{M_h}$;
+   -   *tail_budget* is the memory budget for tail main sample, i.e,. $B_{M_t}$.
    <br><br>
 
 ## Datasets
