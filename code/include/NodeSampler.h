@@ -100,14 +100,10 @@ public:
 
     void get_head_sampled_nodes(node_degree_t &head_map) const {
 
-        int cnt = 0;
         for (const auto &it : head_sampled_nodes_) {
             head_map.insert_unique(it.first, it.second);
-            if (it.second != 0) cnt++;
         }
-
-        std::cout << "[NodeSampler] Head sampled nodes |S_h| = " << head_sampled_nodes_.size() <<
-         " | > 0 are: " << cnt << "\n";
+        
     }
 
     void get_tail_sampled_nodes(node_degree_t &tail_map) const {
