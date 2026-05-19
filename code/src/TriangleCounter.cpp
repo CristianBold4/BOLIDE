@@ -153,24 +153,21 @@ double TriangleCounter::count_triangles(int u, int v, bool is_head, const my_has
     const bool u_in_set = set.find(u) != set.end();
     const bool v_in_set = set.find(v) != set.end();
 
-    // Precompute increments (guard underflow) using correction factors from reservoir sampling
-    double inc_mm = 1.0;
-    if (cur >= 2 && size >= 2) {
-        inc_mm = (double(cur) * double(cur - 1)) / (double(size) * double(size - 1));
-        if (inc_mm < 1.0) inc_mm = 1.0;
-    }
+    auto inv_single_reservoir_prob = [](size_t seen, size_t budget) -> double {
+        if (seen <= budget) return 1.0;
+        return double(seen) / double(budget);
+    };
 
-    double inc_aa = 1.0;
-    if (aux_cur >= 2 && aux_size >= 2) {
-        inc_aa = (double(aux_cur) * double(aux_cur - 1)) / (double(aux_size) * double(aux_size - 1));
-        if (inc_aa < 1.0) inc_aa = 1.0;
-    }
+    auto inv_pair_reservoir_prob = [](size_t seen, size_t budget) -> double {
+        if (seen <= budget) return 1.0;
+        return (double(seen) * double(seen - 1)) /
+               (double(budget) * double(budget - 1));
+    };
 
-    double inc_ma = 1.0;
-    if (cur >= 1 && aux_cur >= 1 && size >= 1 && aux_size >= 1) {
-        inc_ma = (double(cur) / double(size)) * (double(aux_cur) / double(aux_size));
-        if (inc_ma < 1.0) inc_ma = 1.0;
-    }
+    double inc_mm = inv_pair_reservoir_prob(cur, size);
+    double inc_aa = inv_pair_reservoir_prob(aux_cur, aux_size);
+    double inc_ma = inv_single_reservoir_prob(cur, size) *
+                    inv_single_reservoir_prob(aux_cur, aux_size);
 
     double cum_count = 0.0;
 

@@ -155,6 +155,7 @@ public:
 
 
     inline void get_estimates_head(node_triangle_t& estimates, bool verbose = false) const {
+        estimates.clear();
         double check_sum = 0.0;
         for (const auto &it: local_triangle_head_cnt_) {
             int node_id = it.first;
@@ -165,15 +166,17 @@ public:
         }
 
         if (!verbose) return;
+
         // -- capacity of head sample
         double capacity = std::min(1.0, (double) sample_head_cur_ / (double) sample_head_size_);
-        // printf("> [HEAD] Check sum of local triangle estimates = %.3f\n", check_sum);
-        printf("> [HEAD] Local Triangles estimates (||\\hat{T}_h||) = %u\n", local_triangle_head_cnt_.size());
-        printf("> [HEAD] Size of estimates on nodes with tracked degree (S_h \\cup |\\hat{T}_h|) = %u\n", estimates.size());
-        // printf("> [HEAD] Head sample capacity = %.3f%%\n", capacity * 100.0);
+        printf("> [HEAD] |S_h| = %u\n", head_nodes_.size());
+        printf("> [HEAD] |supp(T_h raw)| = %u\n", local_triangle_head_cnt_.size());
+        printf("> [HEAD] |supp(T_h) ∩ S_h| = %u\n", estimates.size());
+
     }
 
     inline void get_estimates_tail(node_triangle_t &estimates, bool verbose = false) const {
+        estimates.clear();
         double check_sum = 0.0;
         for (const auto &it: local_triangle_tail_cnt_) {
             int node_id = it.first;
@@ -185,10 +188,9 @@ public:
 
         if (!verbose) return;
         double capacity = std::min(1.0, (double) sample_tail_cur_ / (double) sample_tail_size_);
-        // printf("> [TAIL] Check sum of local triangle estimates = %.3f\n", check_sum);
-        printf("> [TAIL] Local Triangles estimates (|\\hat{T}_t|) = %u\n", local_triangle_tail_cnt_.size());
-        printf("> [TAIL] Size of estimates on nodes with tracked degree (S_t \\cup |\\hat{T}_t|) = %u\n", estimates.size());
-        // printf("> [TAIL] Tail sample capacity = %.3f%%\n", capacity * 100.0);
+        printf("> [TAIL] |S_t| = %u\n", tail_nodes_.size());
+        printf("> [TAIL] |supp(T_t raw)| = %u\n", local_triangle_tail_cnt_.size());
+        printf("> [TAIL] |supp(T_t) ∩ S_t| = %u\n", estimates.size());
     }
 
 

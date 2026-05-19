@@ -45,13 +45,14 @@ int main(int argc, char **argv) {
             printf("Invalid number of arguments.\n");
             printf("Usage: DataPreprocessing <dataset_path> <delimiter> <skip> <output_path>\n");
             std::cout << "\t- dataset_path: path to the input dataset (edge list format)\n";
-            std::cout << "\t- delimiter: delimiter used in the input dataset (e.g., space, comma, tab), e.g., for tab, use $'\\t'\n";
+            std::cout
+                    << "\t- delimiter: delimiter used in the input dataset (e.g., space, comma, tab), e.g., for tab, use $'\\t'\n";
             std::cout << "\t- skip: number of lines to skip at the beginning of the file (e.g., for header)\n";
             std::cout << "\t- output_path: path to the output file\n";
             return 1;
         } else {
             std::string dataset_path(argv[1]);
-            std::string delimiter (argv[2]);
+            std::string delimiter(argv[2]);
             int skip = atoi(argv[3]);
             std::string output_path(argv[4]);
             utils::StopWatch sw;
@@ -86,20 +87,22 @@ int main(int argc, char **argv) {
 
     if (strcmp(project, "BOLIDE") == 0) {
 
-        if (argc != 11) {
+        if (argc != 12) {
             printf("Invalid number of arguments.\n");
             printf("Usage: BOLIDE <graph_path> <p_head> <p_tail> <eps> "
                    "<output_path> <random_seed_sample> <random_seed_triangle_counter> "
-                   "<aux_sample_size> <head_budget> <tail_budget>\n");
+                   "<aux_head_sample_size> <aux_tail_sample_size> <head_budget> <tail_budget>\n");
             std::cout << "\t- graph_path: path to the input graph stream (edge list format)\n";
             std::cout << "\t- p_head: head sampling probability (for nodes) via hashing\n";
             std::cout << "\t- p_tail: tail sampling probability (for nodes) via sample-and-hold\n";
-            std::cout << "\t- eps: error parameter for degree threshold. From headtail, \\tau = 3.0*log(1/eps) / (eps**2); "
-                         "In the paper, we used \\tau = 10, thus eps ~ 0.5\n";
+            std::cout
+                    << "\t- eps: error parameter for degree threshold. From headtail, \\tau = 3.0*log(1/eps) / (eps**2); "
+                       "In the paper, we used \\tau = 10, thus eps ~ 0.5\n";
             std::cout << "\t- output_path: path to the output file (it will be a csv file)\n";
             std::cout << "\t- random_seed_sample: random seed for sampling nodes (head and tail)\n";
             std::cout << "\t- random_seed_triangle_counter: random seed for triangle counter (sampling edges)\n";
-            std::cout << "\t- aux_sample_size: size of the auxiliary edge sample (to be split in half for head and tail)\n";
+            std::cout << "\t- aux_head_sample_size: size of the auxiliary head edge sample\n";
+            std::cout << "\t- aux_tail_sample_size: size of the auxiliary tail edge sample\n";
             std::cout << "\t- head_budget: budget for the head edge sample (number of edges)\n";
             std::cout << "\t- tail_budget: budget for the tail edge sample (number of edges)\n";
 
@@ -114,16 +117,17 @@ int main(int argc, char **argv) {
         std::string output_path(argv[5]);
         size_t random_seed_sampler = std::stol(argv[6]);
         size_t random_seed_tc = std::stol(argv[7]);
-        size_t aux_sample_size = std::stol(argv[8]);
-        size_t head_budget = std::stol(argv[9]);
-        size_t tail_budget = std::stol(argv[10]);
+        size_t aux_head_sample_size = std::stol(argv[8]);
+        size_t aux_tail_sample_size = std::stol(argv[9]);
+        size_t head_budget = std::stol(argv[10]);
+        size_t tail_budget = std::stol(argv[11]);
 
         NodeSampler sampler(ph, pt, eps, random_seed_sampler);
         // -- aux sample size is split in half for head and tail
         // -- (design choice, we could also have separate parameters for head and tail aux sample sizes)
-        TriangleCounter triangle_counter(aux_sample_size / 2,
-                                         aux_sample_size - aux_sample_size / 2,
-                                         head_budget, tail_budget,random_seed_tc);
+        TriangleCounter triangle_counter(aux_head_sample_size,
+                                         aux_tail_sample_size,
+                                         head_budget, tail_budget, random_seed_tc);
 
         std::string line;
         utils::StopWatch sw;
@@ -138,7 +142,7 @@ int main(int argc, char **argv) {
 
             size_t edge_count = stream.getEdgeCount();
             // -- log progress every 1M edges
-            if (edge_count % 1000000 == 0)
+            if (edge_count % 5000000 == 0)
                 printf("Processed %zuM edges...\n", edge_count / 1000000);
 
 
@@ -200,8 +204,9 @@ int main(int argc, char **argv) {
         // -- save some additional infos
         std::string info_path = stem + "_info.csv";
         std::ofstream info_out_file(info_path, std::ios::app);
-        // -- sample_size,unique_sample_size,aux_sample_size,head_budget,tail_budget,degree_threshold,time
-        info_out_file << sample_size << "," << unique_edges << "," << aux_sample_size << "," << head_budget << ","
+        // -- sample_size,unique_sample_size,aux_head_sample_size,aux_tail_sample_size,head_budget,tail_budget,degree_threshold,time
+        info_out_file << sample_size << "," << unique_edges << "," << aux_head_sample_size << ","
+                      << aux_tail_sample_size << "," << head_budget << ","
                       << tail_budget << "," << deg_thresh << "," << time << "\n";
         info_out_file.close();
 
