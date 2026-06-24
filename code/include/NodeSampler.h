@@ -103,7 +103,7 @@ public:
         for (const auto &it : head_sampled_nodes_) {
             head_map.insert_unique(it.first, it.second);
         }
-        
+
     }
 
     void get_tail_sampled_nodes(node_degree_t &tail_map) const {
