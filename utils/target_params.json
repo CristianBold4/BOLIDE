@@ -2,45 +2,45 @@
   "as-skitter": {
     "p_sample_head": 0.2,
     "p_sample_tail": 0.005,
-    "head_memory_perc": 0.09,
-    "aux_head_memory_perc": 0.005,
-    "tail_memory_perc": 0.01,
+    "head_memory_perc": 0.058,
+    "aux_head_memory_perc": 0.032,
+    "tail_memory_perc": 0.005,
     "aux_tail_memory_perc": 0.005
   },
 
   "livejournal": {
     "p_sample_head": 0.2,
     "p_sample_tail": 0.005,
-    "head_memory_perc": 0.09,
-    "aux_head_memory_perc": 0.005,
-    "tail_memory_perc": 0.01,
+    "head_memory_perc": 0.058,
+    "aux_head_memory_perc": 0.032,
+    "tail_memory_perc": 0.005,
     "aux_tail_memory_perc": 0.005
   },
 
   "com-orkut": {
     "p_sample_head": 0.2,
-    "p_sample_tail": 0.005,
-    "head_memory_perc": 0.09,
-    "aux_head_memory_perc": 0.005,
-    "tail_memory_perc": 0.01,
+    "p_sample_tail": 0.0015,
+    "head_memory_perc": 0.058,
+    "aux_head_memory_perc": 0.032,
+    "tail_memory_perc": 0.005,
     "aux_tail_memory_perc": 0.005
   },
 
   "twitter": {
     "p_sample_head": 0.2,
-    "p_sample_tail": 0.005,
-    "head_memory_perc": 0.09,
-    "aux_head_memory_perc": 0.005,
-    "tail_memory_perc": 0.01,
+    "p_sample_tail": 0.002,
+    "head_memory_perc": 0.058,
+    "aux_head_memory_perc": 0.032,
+    "tail_memory_perc": 0.005,
     "aux_tail_memory_perc": 0.005
   },
 
   "com-friendster": {
     "p_sample_head": 0.2,
-    "p_sample_tail": 0.005,
-    "head_memory_perc": 0.09,
-    "aux_head_memory_perc": 0.005,
-    "tail_memory_perc": 0.01,
+    "p_sample_tail": 0.002,
+    "head_memory_perc": 0.058,
+    "aux_head_memory_perc": 0.032,
+    "tail_memory_perc": 0.005,
     "aux_tail_memory_perc": 0.005
   }
 }

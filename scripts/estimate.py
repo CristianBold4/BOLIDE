@@ -9,6 +9,9 @@ from typing import Dict, Tuple, List
 from pathlib import Path
 
 
+DELTA, ETA = 0.1, 0.001
+
+
 def list_to_dic(l: List[Tuple[int, int]]) -> Dict[int, int]:
     """
     Convert a list of tuples to a dictionary.
@@ -40,11 +43,11 @@ def compute_rhas(distro_a: Dict[int, int], distro_b: Dict[int, int], deg_err: fl
 
             min_err = float("inf")
             for d_ in range(lo, hi + 1):
-                other_freq = B.get(d_)
-                if other_freq is None: continue
+                other_freq = B.get(d_, 0.0)
 
                 diff = abs(freq - other_freq)
                 residual = max(0.0, diff - add_err)
+
                 rel_err = residual / freq
                 if rel_err < min_err: min_err = rel_err
 
@@ -72,7 +75,7 @@ def fetch_exact(root_path: str, dataset_name: str) -> pd.DataFrame:
     Fetch (ground truth) exact data from os files
     """
     print(f'Retrieving exact dataframe...')
-    dataset_root = Path(root_path) / Path(dataset_name)
+    dataset_root = Path('results') / Path(dataset_name) # TODO: change here
     # -- read exact df
     exact_path = Path(f'{dataset_root}') / Path(f'{dataset_name}_exact.txt')
     exact_df = pd.read_csv(exact_path, sep=',')
@@ -107,7 +110,7 @@ def fetch_data(trial_root_path: Path) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Da
     # -- merge degree and triangle estimates
     head_df = pd.merge(cur_degree_head_df, cur_triangles_head_df, on='node_id', how='left')
     tail_df = pd.merge(cur_degree_tail_df, cur_triangles_tail_df, on='node_id', how='left')
-    # print(f'[Merged] head dataframe with shape: {head_df.shape} | tail dataframe with shape: {tail_df.shape}')
+    print(f'[Merged] head dataframe with shape: {head_df.shape} | tail dataframe with shape: {tail_df.shape}')
     # -- read info.csv data
     info_df = pd.read_csv(trial_root_path / Path('exp_info.csv'),
                           names=['sample_size', 'unique_sample_size', 'aux_sample_size', 'head_budget',
@@ -201,7 +204,7 @@ def bin_estimated_df(df_head: pd.DataFrame, df_tail: pd.DataFrame, deg_thresh: i
 
 
 # -- main function for generating plots
-def retrieve_estimates_df(dataset_name: str, root_path: str, target_params: Dict[str, float]) -> Tuple[
+def retrieve_estimates_df(dataset_name: str, root_path: str, target_params: Dict[str, float], bin_base: float) -> Tuple[
     pd.DataFrame, pd.DataFrame, int, pd.DataFrame]:
     exact_df = fetch_exact(root_path, dataset_name)
 
@@ -211,17 +214,25 @@ def retrieve_estimates_df(dataset_name: str, root_path: str, target_params: Dict
     N_TRIALS = 10
     # cumulative dfs over trials
     cum_apx_list, cum_info_list = [], []
-    p_h, p_t, h_p, t_p, a_p = target_params['p_sample_head'], target_params['p_sample_tail'], target_params[
-        'head_memory_perc'], target_params['tail_memory_perc'], target_params['aux_memory_perc'],
+    p_h, p_t, h_p, t_p, a_h, a_t = target_params['p_sample_head'], target_params['p_sample_tail'], target_params[
+        'head_memory_perc'], target_params['tail_memory_perc'], target_params['aux_head_memory_perc'], target_params['aux_tail_memory_perc']
 
     exp_root = Path(root_path) / Path(dataset_name) / Path(f'node_sample_h{p_h}_t{p_t}') / Path(
-        f'aux_b{a_p}_hp{h_p}_tp{t_p}')
+        f'ah{a_h}_at{a_t}_hp{h_p}_tp{t_p}')
     for idx_trial in range(1, N_TRIALS + 1):
         print(f'>>> Retrieving estimates for trial {idx_trial}/{N_TRIALS}...')
         trial_root = exp_root / Path(f'trial_{idx_trial:02d}')
 
         head_df, tail_df, info_df = fetch_data(trial_root)
         deg_thresh = info_df['deg_thresh'].values[0]
+        # move deg_thresh to the rightmost in the next bin of power of two
+        num_p = int(np.floor(np.log(deg_thresh) / np.log(2)))
+        deg_thresh = int(2 ** (num_p + 2))
+        print(f'Deg thresh (tau): {deg_thresh}')
+
+        head_df = head_df.fillna({'est_local_triangles': 0.0})
+        tail_df = tail_df.fillna({'est_local_triangles': 0.0})
+
 
         # Algorithm Estimate: compute NDCC and WDCC exact and estimated distributions for each single degree {d}
         print(f'Binning estimated df per single degree...')
@@ -257,7 +268,7 @@ def bin_df(df_input: pd.DataFrame, bins: List[float], is_exact: bool) -> pd.Data
 def retrieve_distros(df_exact: pd.DataFrame, df_apx: pd.DataFrame, bin_size: float) -> Tuple[
     pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     # params for RHAS (fixed)
-    delta, eta = 0.1, 0.005
+
 
     max_degree = df_exact['degree'].max()
     # -- compute degree intervals
@@ -287,8 +298,8 @@ def retrieve_distros(df_exact: pd.DataFrame, df_apx: pd.DataFrame, bin_size: flo
 
         cc_apx_ndcc = dict(zip(df_apx_binned['binned_id'], df_apx_binned['est_ndcc']))
         cc_apx_wdcc = dict(zip(df_apx_binned['binned_id'], df_apx_binned['est_wdcc']))
-        rhas_distance_ndcc = compute_rhas(cc_exact_ndcc, cc_apx_ndcc, delta, eta)
-        rhas_distance_wdcc = compute_rhas(cc_exact_wdcc, cc_apx_wdcc, delta, eta)
+        rhas_distance_ndcc = compute_rhas(cc_exact_ndcc, cc_apx_ndcc, DELTA, ETA)
+        rhas_distance_wdcc = compute_rhas(cc_exact_wdcc, cc_apx_wdcc, DELTA, ETA)
 
         x_axis_rh = sorted(rhas_distance_ndcc.keys())
         df_rh_ndcc = pd.DataFrame({'binned_id': x_axis_rh, 'rh_distance': [rhas_distance_ndcc[d] for d in x_axis_rh]})
@@ -306,15 +317,31 @@ def retrieve_distros(df_exact: pd.DataFrame, df_apx: pd.DataFrame, bin_size: flo
 def main(args: argparse.Namespace):
     with open(f'./utils/target_params.json', 'r') as f: target_params = json.load(f)[args.dataset_name]
 
-    binned_apx_df, binned_exact_df, avg_deg_thresh, cum_info_df = retrieve_estimates_df(args.dataset_name,
-                                                                                        args.root_path, target_params)
-    exact_distros, est_distros, rhas_ndcc, rhas_wdcc = retrieve_distros(binned_exact_df, binned_apx_df, args.bin_size)
+    if args.bin_size == 0 or args.bin_size is None: bin_range = [2.0, 1.5, 1.2, 1.1]
+    else: bin_range = [args.bin_size]
 
-    # save to output
-    exact_distros.to_csv(Path(args.output_folder) / Path(f'{args.dataset_name}_exact_distros.csv'), index=False)
-    est_distros.to_csv(Path(args.output_folder) / Path(f'{args.dataset_name}_est_distros.csv'), index=False)
-    rhas_ndcc.to_csv(Path(args.output_folder) / Path(f'{args.dataset_name}_rhas_ndcc.csv'), index=False)
-    rhas_wdcc.to_csv(Path(args.output_folder) / Path(f'{args.dataset_name}_rhas_wdcc.csv'), index=False)
+    for bin_size in bin_range:
+
+        print(f'----- Processing bin size: {bin_size} | {target_params} -----')
+
+        binned_apx_df, binned_exact_df, avg_deg_thresh, cum_info_df = retrieve_estimates_df(args.dataset_name,
+                                                                                            args.root_path, target_params,
+                                                                                            bin_size)
+        exact_distros, est_distros, rhas_ndcc, rhas_wdcc = retrieve_distros(binned_exact_df, binned_apx_df, bin_size)
+
+        p_h, p_t, h_p, t_p, a_h, a_t = target_params['p_sample_head'], target_params['p_sample_tail'], target_params[
+            'head_memory_perc'], target_params['tail_memory_perc'], target_params['aux_head_memory_perc'], target_params['aux_tail_memory_perc']
+
+        # save to output
+        output_folder = Path(args.output_folder) / Path(args.dataset_name)
+        os.makedirs(output_folder, exist_ok=True)
+        exact_distros.to_csv(Path(output_folder) / Path(f'bin_size{bin_size}_exact_distros.csv'), index=False)
+        output_folder = (Path(args.output_folder) / Path(args.dataset_name) / Path(f'ph{p_h}_pt{p_t}') /
+                         Path(f'ah{a_h}_at{a_t}_hp{h_p}_tp{t_p}'))
+        os.makedirs(output_folder, exist_ok=True)
+        est_distros.to_csv(Path(output_folder) / Path(f'bin_size{bin_size}_est_distros.csv'), index=False)
+        rhas_ndcc.to_csv(Path(output_folder) / Path(f'bin_size{bin_size}_rhas_ndcc_eta{ETA}.csv'), index=False)
+        rhas_wdcc.to_csv(Path(output_folder) / Path(f'bin_size{bin_size}_rhas_wdcc_eta{ETA}.csv'), index=False)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Script for generating plots")
