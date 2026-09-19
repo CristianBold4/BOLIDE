@@ -1,8 +1,6 @@
 # Single-Pass Estimation of the Clustering Coefficient Distribution in Graph Streams
 
-Cristian Boldrin and C. Seshadhri, "Single-Pass Estimation of the Clustering Coefficient Distribution in Graph Streams", under review for VLDB 2027.
-
-**Supplementary Material** is located in the root folder (open pdf [here](https://github.com/CristianBold4/BOLIDE/blob/main/supp_material.pdf))
+Cristian Boldrin and C. Seshadhri, "Single-Pass Estimation of the Clustering Coefficient Distribution in Graph Streams", VLDB 2027.
 
 ---
 
@@ -17,6 +15,8 @@ Within the `code` folder:
    <br><br>
    The binaries will be generated inside the `code/build` folder.
    <br><br>
+
+   For instance: `./build/DataPreprocessing dataset/soc-LiveJournal1.txt $'\t' 4 dataset/livejournal_preprocessed.txt` (remember to gunzip the dataset). 
 
 2. Preprocess the raw dataset
    <br><br>
