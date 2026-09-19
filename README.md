@@ -1,8 +1,6 @@
 # Single-Pass Estimation of the Clustering Coefficient Distribution in Graph Streams
 
-Cristian Boldrin and C. Seshadhri, "Single-Pass Estimation of the Clustering Coefficient Distribution in Graph Streams", under review for VLDB 2027.
-
-**Supplementary Material** is located in the root folder (open pdf [here](https://github.com/CristianBold4/BOLIDE/blob/main/supp_material.pdf))
+Cristian Boldrin and C. Seshadhri, "Single-Pass Estimation of the Clustering Coefficient Distribution in Graph Streams", VLDB 2027.
 
 ---
 
