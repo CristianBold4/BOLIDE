@@ -16,6 +16,8 @@ Within the `code` folder:
    The binaries will be generated inside the `code/build` folder.
    <br><br>
 
+   For instance: `./build/DataPreprocessing dataset/soc-LiveJournal1.txt $'\t' 4 dataset/livejournal_preprocessed.txt` (remember to gunzip the dataset). 
+
 2. Preprocess the raw dataset
    <br><br>
    `./build/DataPreprocessing <dataset_path> <delimiter> <skip> <output_path>`
