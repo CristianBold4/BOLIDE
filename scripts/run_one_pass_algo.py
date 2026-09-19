@@ -35,12 +35,13 @@ def run_one_pass_algo(args: argparse.Namespace) -> None:
     p_sample_tail = params['p_sample_tail']
     head_memory_perc = params['head_memory_perc']
     tail_memory_perc = params['tail_memory_perc']
-    aux_memory_perc = params['aux_memory_perc']
+    aux_head_memory_perc = params['aux_head_memory_perc']
+    aux_tail_memory_perc = params['aux_tail_memory_perc']
 
     # -- assertions
     assert (0 <= head_memory_perc <= 1 and 0 <= tail_memory_perc <= 1), "Error! hp and ht must be in [0, 1]"
     assert (0 <= p_sample_head <= 1 and 0 <= p_sample_tail <= 1), "Error! p_sample_head and p_sample_tail must be in [0, 1]"
-    assert (0 <= aux_memory_perc <= 1), "Error! aux_memory_perc must be in [0, 1]"
+    assert (0 <= aux_head_memory_perc <= 1 and 0 <= aux_tail_memory_perc <= 1), "Error! aux_memory_perc must be in [0, 1]"
 
 
     output_root = Path(args.output_dir) / Path(args.dataset_name)
@@ -51,11 +52,13 @@ def run_one_pass_algo(args: argparse.Namespace) -> None:
     """
     # -- Run Exact
     exact_path = output_root / Path(f'{args.dataset_name}_exact.txt')
-    command = (f"{EXACT_EXECUTABLE_PATH} "
-               f"{args.dataset_path} "
-               f"{exact_path} "
-               )
-    os.system(command)
+    # skip if path exists
+    if not exact_path.exists():
+        command = (f"{EXACT_EXECUTABLE_PATH} "
+                   f"{args.dataset_path} "
+                   f"{exact_path} "
+                   )
+        os.system(command)
 
 
     """
@@ -66,15 +69,16 @@ def run_one_pass_algo(args: argparse.Namespace) -> None:
     tail_memory_budget = int(tail_memory_perc * num_edges)
 
     sample_root = (output_root / Path(f'node_sample_h{p_sample_head}_t{p_sample_tail}'))
-    random_seed_sample_seq = [int.from_bytes(os.urandom(4), byteorder="big") for _ in range(N_TRIALS)]
+    random_seed_sample_seq = [42 + i for i in range(N_TRIALS)]
     # fix random_seed sequence for all aux budgets and all trials
-    random_seed_tc_seq = [int.from_bytes(os.urandom(4), byteorder="big") for _ in range(N_TRIALS)]
+    random_seed_tc_seq = [4177 + i for i in range(N_TRIALS)]
 
     for trial in range(1, N_TRIALS+1):
 
-        aux_memory_budget = int(aux_memory_perc * num_edges)
+        aux_head_memory_budget = int(aux_head_memory_perc * num_edges)
+        aux_tail_memory_budget = int(aux_tail_memory_perc * num_edges)
 
-        exp_output_root = sample_root / Path(f'aux_b{aux_memory_perc}_hp{head_memory_perc}_tp{tail_memory_perc}') / Path(f'trial_{trial:02d}')
+        exp_output_root = sample_root / Path(f'ah{aux_head_memory_perc}_at{aux_tail_memory_perc}_hp{head_memory_perc}_tp{tail_memory_perc}') / Path(f'trial_{trial:02d}')
         os.makedirs(exp_output_root, exist_ok=True)
 
         # -- write json info within exp_output_root with params
@@ -86,10 +90,12 @@ def run_one_pass_algo(args: argparse.Namespace) -> None:
             'num_edges': num_edges,
             'p_sample_head': p_sample_head,
             'p_sample_tail': p_sample_tail,
-            'aux_memory_perc': aux_memory_perc,
+            'aux_head_memory_perc': aux_head_memory_perc,
+            'aux_tail_memory_perc': aux_tail_memory_perc,
             'head_memory_perc': head_memory_perc,
             'tail_memory_perc': tail_memory_perc,
-            'aux_memory_budget': aux_memory_budget,
+            'aux_head_memory_budget': aux_head_memory_budget,
+            'aux_tail_memory_budget': aux_tail_memory_budget,
             'head_memory_budget': head_memory_budget,
             'tail_memory_budget': tail_memory_budget,
         }
@@ -109,9 +115,10 @@ def run_one_pass_algo(args: argparse.Namespace) -> None:
                    f"{output_path_exp} " # output path
                    f"{random_seed_sample} " # random seed for node sampling
                    f"{random_seed} " # random seed for edge sampling
-                   f"{aux_memory_budget} " # B_{M_h}
+                   f"{aux_head_memory_budget} " # B_{A_h}
+                   f"{aux_tail_memory_budget} " # B_{A_t}
                    f"{head_memory_budget} " # B_{M_t}
-                   f"{tail_memory_budget}" # B_{A_h} + B_{A_t}
+                   f"{tail_memory_budget}" # B_{M_t}
                    )
         os.system(command)
 
